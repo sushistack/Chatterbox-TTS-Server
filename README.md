@@ -1,3 +1,16 @@
+# Important Notice after Fork
+
+- chatterbox version is changed to 0.1.3 for multilingual.
+
+```sh
+pip install numpy
+pip install -r requirements-{your-gpu-option}.txt
+```
+
+I tested on Ubuntu 24.04 + AMD Radeom GPU + python 3.10
+
+<br />
+
 # Chatterbox TTS Server: OpenAI-Compatible API with Web UI, Large Text Handling & Built-in Voices
 
 **Self-host the powerful [Chatterbox TTS model](https://github.com/resemble-ai/chatterbox) with this enhanced FastAPI server! Features an intuitive Web UI, a flexible API endpoint, voice cloning, large text processing via intelligent chunking, audiobook generation, and consistent, reproducible voices using built-in ready-to-use voices and a generation seed feature.**
