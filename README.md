@@ -560,7 +560,6 @@ The primary endpoint for TTS generation is `/tts`, which offers detailed control
     *   `GET /get_predefined_voices`: Lists formatted voices from `voices/`.
     *   `POST /upload_reference`: Uploads reference audio files.
     *   `POST /upload_predefined_voice`: Uploads predefined voice files.
-
 # 🐳 Docker Installation
 
 Run Chatterbox TTS Server easily using Docker. The recommended method uses Docker Compose, which is pre-configured for different GPU types.
@@ -586,7 +585,7 @@ cd Chatterbox-TTS-Server
 ### 2. Start the Container Based on Your Hardware
 
 #### **For NVIDIA GPU:**
-The default `docker-compose.yml` is configured for NVIDIA GPUs and will fall back to CPU if a GPU is not available.
+The default `docker-compose.yml` is configured for NVIDIA GPUs.
 ```bash
 docker compose up -d --build
 ```
@@ -605,8 +604,9 @@ docker compose -f docker-compose-rocm.yml up -d --build
 ```
 
 #### **For CPU-only:**
+A dedicated compose file is now provided for CPU-only users to avoid GPU driver errors.
 ```bash
-TTS_RUNTIME=cpu docker compose up -d --build
+docker compose -f docker-compose-cpu.yml up -d --build
 ```
 
 ⭐ **Note:** The first time you run this, Docker will build the image and download model files, which can take some time. Subsequent starts will be much faster.
@@ -634,19 +634,21 @@ docker compose -f docker-compose-rocm.yml exec chatterbox-tts-server rocm-smi
 docker compose -f docker-compose-rocm.yml exec chatterbox-tts-server python3 -c "import torch; print(f'ROCm available: {torch.cuda.is_available()}'); print(f'Device name: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"No GPU detected\"}')"
 ```
 
-### 5. View Logs and Manage Container
-```bash
+### 5. View Logs and Manage Container```bash
 # View logs
-docker compose logs -f  # For NVIDIA/CPU
-docker compose -f docker-compose-rocm.yml logs -f  # For AMD
+docker compose logs -f                                    # For NVIDIA
+docker compose -f docker-compose-rocm.yml logs -f         # For AMD
+docker compose -f docker-compose-cpu.yml logs -f          # For CPU
 
 # Stop the container
-docker compose down  # For NVIDIA/CPU
-docker compose -f docker-compose-rocm.yml down  # For AMD
+docker compose down                                       # For NVIDIA
+docker compose -f docker-compose-rocm.yml down            # For AMD
+docker compose -f docker-compose-cpu.yml down             # For CPU
 
 # Restart the container
-docker compose restart chatterbox-tts-server  # For NVIDIA/CPU
-docker compose -f docker-compose-rocm.yml restart chatterbox-tts-server  # For AMD
+docker compose restart chatterbox-tts-server              # For NVIDIA
+docker compose -f docker-compose-rocm.yml restart chatterbox-tts-server # For AMD
+docker compose -f docker-compose-cpu.yml restart chatterbox-tts-server # For CPU
 ```
 
 ## AMD ROCm Support Details
