@@ -758,6 +758,11 @@ async def custom_tts_endpoint(
                 seed=(
                     request.seed if request.seed is not None else get_gen_default_seed()
                 ),
+                language_id=(
+                    request.language
+                    if request.language is not None 
+                    else get_gen_default_language()
+                )
             )
             perf_monitor.record(f"Engine synthesized chunk {i+1}")
 
@@ -936,6 +941,7 @@ async def openai_speech_endpoint(request: OpenAISpeechRequest):
             exaggeration=get_gen_default_exaggeration(),
             cfg_weight=get_gen_default_cfg_weight(),
             seed=seed_to_use,
+            language_id=get_gen_default_language(),
         )
 
         if audio_tensor is None or sr is None:
