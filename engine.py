@@ -8,7 +8,7 @@ import torch
 from typing import Optional, Tuple
 from pathlib import Path
 
-from chatterbox.tts import ChatterboxTTS  # Main TTS engine class
+from chatterbox.mtl_tts import ChatterboxMultilingualTTS  # Main TTS engine class
 from chatterbox.models.s3gen.const import (
     S3GEN_SR,
 )  # Default sample rate from the engine
@@ -19,7 +19,7 @@ from config import config_manager
 logger = logging.getLogger(__name__)
 
 # --- Global Module Variables ---
-chatterbox_model: Optional[ChatterboxTTS] = None
+chatterbox_model: Optional[ChatterboxMultilingualTTS] = None
 MODEL_LOADED: bool = False
 model_device: Optional[str] = (
     None  # Stores the resolved device string ('cuda' or 'cpu')
@@ -168,8 +168,8 @@ def load_model() -> bool:
         )
         try:
             # Directly use from_pretrained. This will utilize the standard Hugging Face cache.
-            # The ChatterboxTTS.from_pretrained method handles downloading if the model is not in the cache.
-            chatterbox_model = ChatterboxTTS.from_pretrained(device=model_device)
+            # The ChatterboxMultilingualTTS.from_pretrained method handles downloading if the model is not in the cache.
+            chatterbox_model = ChatterboxMultilingualTTS.from_pretrained(device=model_device)
             # The actual repo ID used by from_pretrained is often internal to the library,
             # but logging the configured one provides user context.
             logger.info(
@@ -214,6 +214,7 @@ def synthesize(
     exaggeration: float = 0.5,
     cfg_weight: float = 0.5,
     seed: int = 0,
+    language: str = "en",
 ) -> Tuple[Optional[torch.Tensor], Optional[int]]:
     """
     Synthesizes audio from text using the loaded TTS model.
@@ -226,6 +227,7 @@ def synthesize(
         cfg_weight: Classifier-Free Guidance weight.
         seed: Random seed for generation. If 0, default randomness is used.
               If non-zero, a global seed is set for reproducibility.
+        language: Target language for synthesizing. default is en.
 
     Returns:
         A tuple containing the audio waveform (torch.Tensor) and the sample rate (int),
@@ -256,12 +258,13 @@ def synthesize(
         wav_tensor = chatterbox_model.generate(
             text=text,
             audio_prompt_path=audio_prompt_path,
+            language_id=language,
             temperature=temperature,
             exaggeration=exaggeration,
             cfg_weight=cfg_weight,
         )
 
-        # The ChatterboxTTS.generate method already returns a CPU tensor.
+        # The ChatterboxMultilingualTTS.generate method already returns a CPU tensor.
         return wav_tensor, chatterbox_model.sr
 
     except Exception as e:
